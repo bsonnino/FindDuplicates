@@ -146,6 +146,7 @@ namespace FindDuplicates
             {
                 var compareOnlyFirstPartOfFile = ChkCompareOnlyFirstPartOfFile.IsChecked ?? false;
                 var hash = GetMD5HashFromFile(file.FullName, compareOnlyFirstPartOfFile);
+                if (hash == null) return;
                 file.Delete();
                 var filesListItemsSource = (Dictionary<string, List<FileInfo>>)FilesList.ItemsSource;
                 if (filesListItemsSource.TryGetValue(hash, out var item))
