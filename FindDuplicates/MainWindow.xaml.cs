@@ -1,5 +1,4 @@
-﻿using Crc32C;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -81,53 +80,26 @@ namespace FindDuplicates
                 $"({allFiles.Sum(f => f.Length):N0} total duplicate bytes) {sw.ElapsedMilliseconds} ms";
         }
 
-        private static async Task<Dictionary<uint, List<FileInfo>>> GetRealDuplicatesAsync(
+        private static async Task<Dictionary<string, List<FileInfo>>> GetRealDuplicatesAsync(
             List<IGrouping<long, FileInfo>> files)
         {
-            var dictFiles = new ConcurrentDictionary<uint, ConcurrentBag<FileInfo>>();
+            var dictFiles = new ConcurrentDictionary<string, ConcurrentBag<FileInfo>>();
             await Task.Factory.StartNew(() =>
             {
                 Parallel.ForEach(files.SelectMany(g => g), file =>
-                {
-                    var hash = GetCrc32FromFile(file.FullName);
-                    if (hash != 0)
                     {
-                        if (dictFiles.ContainsKey(hash))
-                            dictFiles[hash].Add(file);
-                        else
-                            dictFiles.TryAdd(hash, new ConcurrentBag<FileInfo>(new[] { file }));
-                    }
-                });
+                        var hash = GetMD5HashFromFile(file.FullName);
+                        dictFiles.AddOrUpdate(hash, key => new ConcurrentBag<FileInfo>(new List<FileInfo> { file }),
+                            (s, bag) =>
+                            {
+                                bag.Add(file);
+                                return bag;
+                            });
+                    });
             });
             return dictFiles.Where(p => p.Value.Count > 1)
                 .OrderByDescending(p => p.Value.First().Length)
                 .ToDictionary(p => p.Key, p => p.Value.ToList());
-        }
-
-        public static uint GetCrc32FromFile(string fileName)
-        {
-            try
-            {
-                using (FileStream file = new FileStream(fileName, FileMode.Open))
-                {
-                    const int NumBytes = 10000;
-                    var bytes = new byte[NumBytes];
-                    var numRead = file.Read(bytes, 0, NumBytes);
-                    if (numRead == 0)
-                        return 0;
-                    var crc = 0u;
-                    while (numRead > 0)
-                    {
-                        Crc32CAlgorithm.Append(crc, bytes, 0, numRead);
-                        numRead = file.Read(bytes, 0, NumBytes);
-                    }
-                    return crc;
-                }
-            }
-            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
-            {
-                return 0;
-            }
         }
 
         public static string GetMD5HashFromFile(string fileName)
