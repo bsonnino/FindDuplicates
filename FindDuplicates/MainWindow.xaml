@@ -11,40 +11,48 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button Width="85" Height="30" Content="Start" Click="StartClick"
-                    HorizontalAlignment="Right" Margin="5" Grid.Row="0"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="0">
+            <CheckBox Name="ChkCheckBeforeDelete" VerticalAlignment="Center" Margin="5" IsChecked="True">Confirm before deletion</CheckBox>
+            <CheckBox Name="ChkTakeSmallResultSet" VerticalAlignment="Center" Margin="5" IsChecked="True">Small result set</CheckBox>
+            <CheckBox Name="ChkCompareOnlyFirstPartOfFile" VerticalAlignment="Center" Margin="5">Compare first part of file only (fast mode)</CheckBox>
+            <Button Width="85" Height="30" Content="Start" Click="StartClick" Margin="5"/>
+        </StackPanel>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl x:Name="FilesList" HorizontalContentAlignment="Stretch">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding Value[0].Length, StringFormat=N0}"
+                <ItemsControl x:Name="FilesList" HorizontalContentAlignment="Stretch">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Value[0].Length, StringFormat=N0}"
                                        Margin="5" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding Key, StringFormat=X}"
+                                <TextBlock Text="{Binding Key, StringFormat=X}"
                                        Margin="5" FontWeight="Bold" HorizontalAlignment="Right"/>
-                            <ItemsControl ItemsSource="{Binding Value}" Grid.Row="1" 
+                                <ItemsControl ItemsSource="{Binding Value}" Grid.Row="1" 
                                           HorizontalAlignment="Stretch"
                                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                           Background="Aquamarine">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding FullName}" Margin="15,0"  />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid  Margin="15,0">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="85"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                <Button Width="75" Margin="2" Grid.Column="0" Click="RemoveFile">Remove</Button>
+                                                <TextBlock Text="{Binding FullName}" Margin="2" Grid.Column="1" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <TextBlock x:Name="TotalFilesText" Margin="5,0" VerticalAlignment="Center"/>
