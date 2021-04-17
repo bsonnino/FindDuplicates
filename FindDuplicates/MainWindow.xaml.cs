@@ -73,9 +73,10 @@ namespace FindDuplicates
             var selectedPath = fbd.FileName;
 
             var files = await GetPossibleDuplicatesAsync(selectedPath);
-            FilesList.ItemsSource = await GetRealDuplicatesAsync(files);
+            var realDuplicates = await GetRealDuplicatesAsync(files);
+            FilesList.ItemsSource = realDuplicates;
             sw.Stop();
-            var allFiles = files.SelectMany(f => f).ToList();
+            var allFiles = realDuplicates.SelectMany(f => f.Value).ToList();
             TotalFilesText.Text = $"{allFiles.Count} files found " +
                 $"({allFiles.Sum(f => f.Length):N0} total duplicate bytes) {sw.ElapsedMilliseconds} ms";
         }
