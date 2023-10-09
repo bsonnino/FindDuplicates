@@ -118,7 +118,7 @@ namespace FindDuplicates
                     var crc = 0u;
                     while (numRead > 0)
                     {
-                        Crc32CAlgorithm.Append(crc, bytes, 0, numRead);
+                        crc = Crc32CAlgorithm.Append(crc, bytes, 0, numRead);
                         numRead = file.Read(bytes, 0, NumBytes);
                     }
                     return crc;
